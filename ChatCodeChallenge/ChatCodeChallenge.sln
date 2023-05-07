@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32328.378
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatCodeChallenge", "ChatCodeChallenge\ChatCodeChallenge.csproj", "{EC4DA141-5492-4D13-8270-C090FEFD35DA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EC4DA141-5492-4D13-8270-C090FEFD35DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC4DA141-5492-4D13-8270-C090FEFD35DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC4DA141-5492-4D13-8270-C090FEFD35DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC4DA141-5492-4D13-8270-C090FEFD35DA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {15C9324E-2EFF-4414-AB02-70B1808346F9}
+	EndGlobalSection
+EndGlobal
