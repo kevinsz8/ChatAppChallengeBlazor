@@ -53,10 +53,18 @@
     private async Task Send()
     {
         if (hubConnection is not null)
+        {
+            if(messageInput!=null && messageInput.StartsWith("/stock="))
+            {
+                await hubConnection.SendAsync("PostCommandMessage", userInput, messageInput);
+                messageInput = "";
+            }
+            else
             {
                 await hubConnection.SendAsync("SendMessage", userInput, messageInput);
                 messageInput = "";
             }
+        }
     }
 
     public bool IsConnected =>
