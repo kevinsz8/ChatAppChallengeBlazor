@@ -34,6 +34,32 @@ a, .btn-link {
     color: red;
 }
 
+.label {
+    color: white;
+    padding: 8px;
+}
+
+.danger {
+    background-color: #f44336;
+}
+
+#messageList {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+
+    #messageList li {
+        margin-bottom: 5px;
+        padding: 10px;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;

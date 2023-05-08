@@ -1,4 +1,4 @@
-using ChatCodeChallenge.Data;
+
 using Microsoft.AspNetCore.ResponseCompression;
 using ChatCodeChallenge.Hubs;
 
@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
+
 
 builder.Services.AddResponseCompression(opts =>{
     opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });

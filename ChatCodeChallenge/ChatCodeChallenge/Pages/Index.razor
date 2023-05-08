@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using ChatCodeChallenge.Models
 @using Microsoft.AspNetCore.SignalR.Client
 @inject NavigationManager Navigation
 @implements IAsyncDisposable
@@ -20,19 +21,24 @@
 <button @onclick="Send" disabled="@(!IsConnected)">Send</button>
 
 <hr>
-
-<ul id="messagesList">
+<div style="overflow-y:auto; ">
+    <ul id="messagesList">
     @foreach (var message in messages)
     {
-        <li>@message</li>
+
+        <li>@message.UserName : @message.Message <span style="float:right"> @message.TimeStamp </span> </li>
     }
-</ul>
+    </ul>
+</div>
+
 
 @code {
     private HubConnection? hubConnection;
-    private List<string> messages = new List<string>();
+    private List<ChatMessage> messages = new List<ChatMessage>();
     private string? userInput;
     private string? messageInput;
+    public int messageCount = 0;
+    public int maxMessageCount = 50;
 
     protected override async Task OnInitializedAsync()
     {
@@ -40,12 +46,26 @@
             .WithUrl(Navigation.ToAbsoluteUri("/chathub"))
             .Build();
 
-        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
-        {
-            var encodedMsg = $"{user}: {message}";
-            messages.Add(encodedMsg);
-            InvokeAsync(StateHasChanged);
-        });
+
+        hubConnection.On<string, string, DateTime>("ReceiveMessage", (user, message, timestamp) =>
+         {
+             messages.Add(new ChatMessage
+                 {
+                     UserName = user,
+                     Message = message,
+                     TimeStamp = timestamp
+                 });
+             messageCount++;
+             messages.OrderBy(x => x.TimeStamp);
+
+             if (messages.Count > maxMessageCount)
+             {
+                 messages.RemoveAt(0);
+             }
+
+             InvokeAsync(StateHasChanged);
+         });
+
 
         await hubConnection.StartAsync();
     }
@@ -54,15 +74,12 @@
     {
         if (hubConnection is not null)
         {
-            if(messageInput!=null && messageInput.StartsWith("/stock="))
+            if (!string.IsNullOrEmpty(messageInput))
             {
-                await hubConnection.SendAsync("PostCommandMessage", userInput, messageInput);
-                messageInput = "";
-            }
-            else
-            {
-                await hubConnection.SendAsync("SendMessage", userInput, messageInput);
-                messageInput = "";
+                var hubMethod = messageInput.StartsWith("/stock=") ? "PostCommandMessage" : "SendMessage";
+                await hubConnection.SendAsync(hubMethod, userInput, messageInput,DateTime.Now);
+
+                //messageInput = "";
             }
         }
     }
