@@ -1,10 +1,17 @@
 ﻿using ChatCodeChallenge.Models;
+using ChatCodeChallenge.RabbitMQ;
 using Microsoft.AspNetCore.SignalR;
 
 namespace ChatCodeChallenge.Hubs
 {
     public class ChatHub : Hub
     {
+        private readonly IRabitMQService _rabitMQProducer;
+
+        public ChatHub(IRabitMQService rabitMQProducer)
+        {
+            _rabitMQProducer = rabitMQProducer;
+        }
 
         public async Task SendMessage(string user, string message,DateTime timeStamp)
         {
@@ -23,7 +30,7 @@ namespace ChatCodeChallenge.Hubs
 
                 if (stockCode != "aapl.us")
                 {
-                    await Clients.All.SendAsync("ReceiveMessage", "Exception", stockCode + " is an invalid command.", timeStamp);
+                    await Clients.All.SendAsync("ReceiveMessageFromMQ", "Exception", stockCode + " is an invalid command.", timeStamp);
                     return;
                 }
 
@@ -31,7 +38,7 @@ namespace ChatCodeChallenge.Hubs
                 var stockInfo = await GetStockInfo(stockCode);
                 var newmessage = stockInfo.StockCode.ToUpper() + " quote is $" + stockInfo.CurrentPrice + " per share.";
 
-                await Clients.All.SendAsync("ReceiveMessage", "Skynet", newmessage, timeStamp);
+                _rabitMQProducer.SendStockMessage(newmessage);
 
 
             }
