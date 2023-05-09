@@ -43,45 +43,59 @@
 
     protected override async Task OnInitializedAsync()
     {
-        hubConnection = new HubConnectionBuilder()
-            .WithUrl(Navigation.ToAbsoluteUri("/chatHub"))
-            .Build();
+        try
+        {
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl(Navigation.ToAbsoluteUri("/chatHub"))
+                .Build();
 
 
-        hubConnection.On<string, string, DateTime>("ReceiveMessage", (user, message, timestamp) =>
-         {
-             messages.Add(new ChatMessage
-                 {
-                     UserName = user,
-                     Message = message,
-                     TimeStamp = timestamp
-                 });
-             messageCount++;
-             messages.OrderBy(x => x.TimeStamp);
+            hubConnection.On<string, string, DateTime>("ReceiveMessage", (user, message, timestamp) =>
+            {
+                messages.Add(new ChatMessage
+                    {
+                        UserName = user,
+                        Message = message,
+                        TimeStamp = timestamp
+                    });
+                messageCount++;
+                messages.OrderBy(x => x.TimeStamp);
 
-             if (messages.Count > maxMessageCount)
-             {
-                 messages.RemoveAt(0);
-             }
+                if (messages.Count > maxMessageCount)
+                {
+                    messages.RemoveAt(0);
+                }
 
-             InvokeAsync(StateHasChanged);
-         });
+                InvokeAsync(StateHasChanged);
+            });
 
 
-        await hubConnection.StartAsync();
+            await hubConnection.StartAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error connecting to the SignalR hub: " + ex.Message);
+        }
     }
 
     private async Task Send()
     {
-        if (hubConnection is not null)
+        try
         {
-            if (!string.IsNullOrEmpty(messageInput))
+            if (hubConnection is not null)
             {
-                var hubMethod = messageInput.StartsWith("/stock=") ? "PostCommandMessage" : "SendMessage";
-                await hubConnection.SendAsync(hubMethod, userInput, messageInput,DateTime.Now);
+                if (!string.IsNullOrEmpty(messageInput))
+                {
+                    var hubMethod = messageInput.StartsWith("/stock=") ? "PostCommandMessage" : "SendMessage";
+                    await hubConnection.SendAsync(hubMethod, userInput, messageInput, DateTime.Now);
 
-                //messageInput = "";
+                    messageInput = "";
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error sending message to the SignalR hub: " + ex.Message);
         }
     }
 

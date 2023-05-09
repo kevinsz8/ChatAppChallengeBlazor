@@ -25,7 +25,6 @@ namespace ChatCodeChallenge.Hubs
         {
             if (message.StartsWith("/stock="))
             {
-
                 var stockCode = message.Substring(7);
 
                 if (stockCode != "aapl.us")
@@ -34,13 +33,21 @@ namespace ChatCodeChallenge.Hubs
                     return;
                 }
 
-                //this is the Stock API Call
-                var stockInfo = await GetStockInfo(stockCode);
-                var newmessage = stockInfo.StockCode.ToUpper() + " quote is $" + stockInfo.CurrentPrice + " per share.";
-
-                _rabitMQProducer.SendStockMessage(newmessage);
-
-
+                try
+                {
+                    //this is the Stock API Call
+                    var stockInfo = await GetStockInfo(stockCode);
+                    var newmessage = stockInfo.StockCode.ToUpper() + " quote is $" + stockInfo.CurrentPrice + " per share.";
+                    _rabitMQProducer.SendStockMessage(newmessage);
+                }
+                catch (HttpRequestException ex)
+                {
+                    await Clients.All.SendAsync("ReceiveMessageFromMQ", "Exception", ex.Message, timeStamp);
+                }
+                catch (Exception ex)
+                {
+                    await Clients.All.SendAsync("ReceiveMessageFromMQ", "Exception", "An error occurred while processing your request. Please try again later.", timeStamp);
+                }
             }
         }
 
@@ -49,29 +56,38 @@ namespace ChatCodeChallenge.Hubs
         {
             var apiUrl = $"https://stooq.com/q/l/?s={stockCode}&f=sd2t2ohlcv&h&e=csv";
 
-            using var httpClient = new HttpClient();
-            using var response = await httpClient.GetAsync(apiUrl);
-            response.EnsureSuccessStatusCode();
-            var csvData = await response.Content.ReadAsStringAsync();
-
-
-            var lines = csvData.Split('\n');
-            if (lines.Length >= 2)
+            try
             {
-                var values = lines[1].Split(',');
-                if (values.Length >= 7 && decimal.TryParse(values[6], out var currentPrice))
+                using var httpClient = new HttpClient();
+                using var response = await httpClient.GetAsync(apiUrl);
+                response.EnsureSuccessStatusCode();
+                var csvData = await response.Content.ReadAsStringAsync();
+
+                var lines = csvData.Split('\n');
+                if (lines.Length >= 2)
                 {
-                    return new StockInfo
+                    var values = lines[1].Split(',');
+                    if (values.Length >= 7 && decimal.TryParse(values[6], out var currentPrice))
                     {
-                        StockCode = stockCode,
-                        CurrentPrice = currentPrice
-                    };
+                        return new StockInfo
+                        {
+                            StockCode = stockCode,
+                            CurrentPrice = currentPrice
+                        };
+                    }
                 }
             }
-
+            catch (HttpRequestException ex)
+            {
+                throw new Exception("An error occurred while fetching stock data.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while processing stock data.", ex);
+            }
 
             return new StockInfo();
         }
-        
+
     }
 }

@@ -5,9 +5,7 @@ VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatCodeChallenge", "ChatCodeChallenge\ChatCodeChallenge.csproj", "{EC4DA141-5492-4D13-8270-C090FEFD35DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQConsumer", "RabbitMQConsumer\RabbitMQConsumer.csproj", "{C98DF56E-8735-48BF-9974-0ADF648C3650}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestsChatApp", "UnitTestsChatApp\UnitTestsChatApp.csproj", "{A11BC890-F624-4DDB-AE01-CBD4729D1EC2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RabbitMQConsumer", "RabbitMQConsumer\RabbitMQConsumer.csproj", "{C98DF56E-8735-48BF-9974-0ADF648C3650}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +21,6 @@ Global
 		{C98DF56E-8735-48BF-9974-0ADF648C3650}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C98DF56E-8735-48BF-9974-0ADF648C3650}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C98DF56E-8735-48BF-9974-0ADF648C3650}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A11BC890-F624-4DDB-AE01-CBD4729D1EC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A11BC890-F624-4DDB-AE01-CBD4729D1EC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A11BC890-F624-4DDB-AE01-CBD4729D1EC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A11BC890-F624-4DDB-AE01-CBD4729D1EC2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
