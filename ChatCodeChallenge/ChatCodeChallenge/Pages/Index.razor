@@ -44,7 +44,7 @@
     protected override async Task OnInitializedAsync()
     {
         hubConnection = new HubConnectionBuilder()
-            .WithUrl(Navigation.ToAbsoluteUri("/chathub"))
+            .WithUrl(Navigation.ToAbsoluteUri("/chatHub"))
             .Build();
 
 
