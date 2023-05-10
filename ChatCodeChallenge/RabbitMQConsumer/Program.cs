@@ -5,34 +5,46 @@ using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using System.Text;
 
-var hubConnection = new HubConnectionBuilder()
-    .WithUrl("https://localhost:7187/chatHub")
-    .Build();
-
-hubConnection.StartAsync().Wait();
-
-var factory = new ConnectionFactory
+try
 {
-    HostName = "localhost"
-};
+    var hubConnection = new HubConnectionBuilder()
+        .WithUrl("https://localhost:7187/chatHub")
+        .Build();
 
-var connection = factory.CreateConnection();
+    await hubConnection.StartAsync();
 
-using
-var channel = connection.CreateModel();
+    var factory = new ConnectionFactory
+    {
+        HostName = "localhost"
+    };
 
-channel.QueueDeclare("stockInfo", exclusive: false);
+    var connection = factory.CreateConnection();
 
-var consumer = new EventingBasicConsumer(channel);
-consumer.Received += async (model, eventArgs) =>
+    using var channel = connection.CreateModel();
+
+    channel.QueueDeclare("stockInfo", exclusive: false);
+
+    var consumer = new EventingBasicConsumer(channel);
+    consumer.Received += async (model, eventArgs) =>
+    {
+        try
+        {
+            var body = eventArgs.Body.ToArray();
+            var message = Encoding.UTF8.GetString(body);
+            await hubConnection.InvokeAsync("SendMessage", "Skynet", message, DateTime.Now);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error occurred while processing message: {ex.Message}");
+        }
+    };
+
+    channel.BasicConsume(queue: "stockInfo", autoAck: true, consumer: consumer);
+    Console.ReadKey();
+}
+catch (Exception ex)
 {
-    var body = eventArgs.Body.ToArray();
-    var message = Encoding.UTF8.GetString(body);
-    hubConnection.InvokeAsync("SendMessage", "Skynet", message, DateTime.Now).Wait();
-
-};
-
-channel.BasicConsume(queue: "stockInfo", autoAck: true, consumer: consumer);
-Console.ReadKey();
+    Console.WriteLine($"An error occurred: {ex.Message}");
+}
 
 
